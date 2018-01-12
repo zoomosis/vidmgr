@@ -10,7 +10,8 @@ COPTS=-oneatx
 objs=qmenu.obj    \
      vidmgr.obj   \
      vmgrdos.obj  \
-     vioimage.obj
+     vioimage.obj \
+     opsys.obj
 
 qmenu.exe: $(objs)
   wcl $(COPTS) -fe=qmenu.exe $(objs)
