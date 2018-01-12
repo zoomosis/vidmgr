@@ -1,8 +1,8 @@
 /*
- *  VMGRWNT.C; VidMgr module for Windows 95/NT compilers.  Release 1.2.
+ *  VMGRWNT.C; VidMgr module for Windows 95/NT compilers.  Release 1.3.
  *
  *  This module written in May 1996 by Andrew Clarke and released to the
- *  public domain.  Last modified in July 1996.
+ *  public domain.  Last modified in October 1996.
  */
 
 #include <stdlib.h>
@@ -119,7 +119,9 @@ int vm_kbhit(void)
     DWORD pcRead;
 
     if (key_hit != 0xFFFFFFFFUL)
+    {
         return (int)key_hit;
+    }
 
     memset(&irBuffer, 0, sizeof irBuffer);
 
@@ -141,7 +143,7 @@ int vm_kbhit(void)
             uc = irBuffer.Event.KeyEvent.uChar.AsciiChar;
 #endif
 
-            fShift = (irBuffer.Event.KeyEvent.dwControlKeyState & (SHIFT_PRESSED));
+            fShift = (irBuffer.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED);
             fAlt = (irBuffer.Event.KeyEvent.dwControlKeyState & (RIGHT_ALT_PRESSED + LEFT_ALT_PRESSED));
             fCtrl = (irBuffer.Event.KeyEvent.dwControlKeyState & (RIGHT_CTRL_PRESSED + LEFT_CTRL_PRESSED));
 
@@ -151,28 +153,60 @@ int vm_kbhit(void)
                 {
                 case 0x21:     /* PgUp */
                     if (fCtrl)
+                    {
                         vs = 0x84;  /* Ctrl+PgUp */
+                    }
                     break;
+
                 case 0x22:     /* PgDn */
                     if (fCtrl)
+                    {
                         vs = 0x76;  /* Ctrl+PgDn */
+                    }
                     break;
+
                 case 0x23:     /* End */
                     if (fCtrl)
+                    {
                         vs = 0x75;  /* Ctrl+End */
+                    }
                     break;
+
                 case 0x24:     /* Home */
                     if (fCtrl)
+                    {
                         vs = 0x77;  /* Ctrl+Home */
+                    }
                     break;
+
+                case 0x25:     /* Left Arrow */
+                    if (fCtrl)
+                    {
+                        vs = 0x73;  /* Ctrl+Left Arrow */
+                    }
+                    break;
+
                 case 0x26:     /* Up Arrow */
                     if (fCtrl)
+                    {
                         vs = 0x8d;  /* Ctrl+Up Arrow */
+                    }
                     break;
+
+                case 0x27:     /* Right Arrow */
+                    if (fCtrl)
+                    {
+                        vs = 0x74;  /* Ctrl+Right Arrow */
+                    }
+                    break;
+
                 case 0x28:     /* Down Arrow */
                     if (fCtrl)
+                    {
                         vs = 0x91;  /* Ctrl+Down Arrow */
+                    }
                     break;
+
                 case 0x70:     /* F-Keys */
                 case 0x71:
                 case 0x72:
@@ -184,29 +218,44 @@ int vm_kbhit(void)
                 case 0x78:
                 case 0x79:
                     if (fAlt)
+                    {
                         vs += 0x2d;  /* Alt+F-Key */
+                    }
                     else if (fShift)
+                    {
                         vs += 0x19;  /* Shift+F-Key */
+                    }
                     break;
                 }
 
                 if (vk > 0x20 && vk < 0x92)  /* If it's OK use scan code */
-                    iKey = (vs << 8);
+                {
+                    iKey = vs << 8;
+                }
             }
             else
             {
                 if (fAlt)       /* Alt+Key */
-                    iKey = (vs << 8);
+                {
+                    iKey = vs << 8;
+                }
                 else if (fCtrl) /* Ctrl+Key */
-                    iKey = (vk & 0xbf);
+                {
+                    iKey = vk & 0xbf;
+                }
                 else
+                {
                     iKey = uc;
+                }
             }
         }
     }
 
     if (iKey != 0)
+    {
         key_hit = iKey;
+    }
+
     return (int)iKey;
 }
 
