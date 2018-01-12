@@ -1,0 +1,18 @@
+# Makefile for Cygnus GNU C/C++ for Windows 95/NT b14.0
+
+all: qmenuw32.exe
+
+LIBDIR=/usr/lib
+COPTS=-O2
+
+.c.o:
+  gcc $(COPTS) -Wall -c $<
+
+objs=qmenu.o    \
+     vidmgr.o   \
+     vmgrwnt.o  \
+     vioimage.o
+
+qmenuw32.exe: $(objs)
+  gcc $(COPTS) -Wall -o qmenuw32.exe $(objs) $(LIBDIR)/libkernel32.a
+  strip qmenuw32.exe
