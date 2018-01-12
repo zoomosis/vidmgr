@@ -1,3 +1,5 @@
+### Introduction ###
+
 VidMgr provides a set of screen drawing, cursor and keyboard routines
 for text mode MS-DOS, OS/2 and Windows 95/NT applications.
 
