@@ -2,7 +2,6 @@
 
 all: qmenuw32.exe
 
-LIBDIR=/usr/lib
 COPTS=-O2
 
 .c.o:
@@ -14,5 +13,5 @@ objs=qmenu.o    \
      vioimage.o
 
 qmenuw32.exe: $(objs)
-  gcc $(COPTS) -Wall -o qmenuw32.exe $(objs) $(LIBDIR)/libkernel32.a
+  gcc $(COPTS) -Wall -o qmenuw32.exe $(objs) -lkernel32
   strip qmenuw32.exe
