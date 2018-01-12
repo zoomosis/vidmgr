@@ -1,0 +1,18 @@
+# Makefile for EMX for OS/2 & DOS 0.9b
+
+all: qmenup.exe
+
+LIBDIR=/emx/lib
+COPTS=-O2
+
+.c.o:
+  gcc $(COPTS) -s -Wall -c $<
+
+objs=qmenu.o    \
+     vidmgr.o   \
+     vmgremx.o  \
+     vioimage.o  
+
+qmenup.exe: $(objs)
+  gcc $(COPTS) -s -Wall -o qmenup.exe $(objs) $(LIBDIR)/video.a
+  emxbind -aq qmenup.exe -acm
