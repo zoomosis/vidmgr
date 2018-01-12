@@ -17,7 +17,7 @@
 #define maxy  vm_getscreenheight()
 
 #define PROG     "QuickMenu"
-#define VERSION  "1.0"
+#define VERSION  "1.2"
 
 #define MAXITEMS 12
 
@@ -133,7 +133,7 @@ void qmenuRun(void)
         {
             /* nada */
         }
-        
+
         ch = vm_getch();
         switch (ch)
         {
@@ -143,11 +143,7 @@ void qmenuRun(void)
 
         case 0x4800:    /* up arrow */
             olditem = curritem;
-            if (curritem == 0)
-            {
-                curritem = menuitems - 1;
-            }
-            else
+            if (curritem != 0)
             {
                 curritem--;
             }
@@ -155,11 +151,7 @@ void qmenuRun(void)
 
         case 0x5000:    /* down arrow */
             olditem = curritem;
-            if (curritem == menuitems - 1)
-            {
-                curritem = 0;
-            }
-            else
+            if (curritem != menuitems - 1)
             {
                 curritem++;
             }
