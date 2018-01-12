@@ -1,7 +1,8 @@
 VidMgr provides a set of screen drawing, cursor and keyboard routines
 for text mode MS-DOS, OS/2 and Windows 95/NT applications.
 
-### HISTORY ###
+
+### History ###
 
 VidMgr began life in March 1996 and provided support for a
 limited set of DOS and OS/2 compilers. Two months later, the
@@ -26,9 +27,10 @@ vm_cleareol(), vm_paintcleareol() and vm_filleol() functions. The
 Windows NT module, vmgrwnt.c, now supports the Ctrl+Left and
 Ctrl+Right key combinations.
 
-### SUPPORTED COMPILERS ###
 
-The following compilers have been tested compiling the VidMgr library:
+### Supported compilers ###
+
+The following compilers have been tested building the VidMgr library:
 
 * Borland C++ (16-bit) for DOS 3.1
 * Borland C++ (16-bit) for DOS 4.5
@@ -49,7 +51,8 @@ The following compilers have been tested compiling the VidMgr library:
 * Symantec C/C++ (16-bit) for DOS 7.0
 * Zortech C/C++ (16-bit) for DOS 3.0r4
 
-### COPYRIGHT ###
+
+### Copyright ###
 
 The VidMgr source code was written by Andrew Clarke and released
 to the public domain.
