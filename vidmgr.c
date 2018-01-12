@@ -1,10 +1,10 @@
 /*
  *  VIDMGR.C; Screen drawing, cursor and keyboard routines for text mode
  *            16-bit and 32-bit MS-DOS, 16-bit and 32-bit OS/2, and 32-bit
- *            Windows 95/NT applications.  Release 1.2.
+ *            Windows 95/NT applications.  Release 1.3.
  *
  *  This module written in March 1996 by Andrew Clarke and released to the
- *  public domain.  Last modified in June 1996.
+ *  public domain.  Last modified in October 1996.
  *
  *  VidMgr has been compiled and tested with the following C compilers:
  *
@@ -135,7 +135,7 @@ void vm_paintclearline(char row, char attr)
 
 void vm_paintcleareol(char row, char attr)
 {
-    vm_paintclearbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex()), row, attr);
+    vm_paintclearbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex() + 1), row, attr);
 }
 
 void vm_paintscreen(char attr)
@@ -150,7 +150,7 @@ void vm_paintline(char row, char attr)
 
 void vm_painteol(char row, char attr)
 {
-    vm_paintbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex()), row, attr);
+    vm_paintbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex() + 1), row, attr);
 }
 
 void vm_clearscreen(void)
@@ -165,7 +165,7 @@ void vm_clearline(char row)
 
 void vm_cleareol(char row)
 {
-    vm_clearbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex()), row);
+    vm_clearbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex() + 1), row);
 }
 
 void vm_fillscreen(char ch)
@@ -180,7 +180,7 @@ void vm_fillline(char row, char ch)
 
 void vm_filleol(char row, char ch)
 {
-    vm_fillbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex()), row, ch);
+    vm_fillbox(vm_wherex(), row, (char)(vm_getscreenwidth() - vm_wherex() + 1), row, ch);
 }
 
 void vm_clrscr(void)
