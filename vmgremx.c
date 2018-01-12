@@ -1,5 +1,5 @@
 /*
- *  VMGREMX.C; VidMgr module for the EMX compiler.
+ *  VMGREMX.C; VidMgr module for the EMX GNU C/C++ compiler.  Release 1.2.
  *
  *  This module written in April 1996 by Andrew Clarke and released to the
  *  public domain.  Last modified in June 1996.
@@ -15,7 +15,9 @@
 #define INCL_DOSPROCESS
 
 #include <os2.h>
+
 #include "vidmgr.h"
+#include "opsys.h"
 
 static int vm_iscolorcard(void);
 static void vm_setcursorsize(char start, char end);
@@ -32,6 +34,10 @@ void vm_init(void)
     vi_init();
     vm_getinfo(&vm_startup);
     vm_setattr(vm_startup.attr);
+    if (_osmode == DOS_MODE)
+    {
+        opsysDetect();
+    }
 }
 
 void vm_done(void)
@@ -195,6 +201,12 @@ int vm_kbhit(void)
     if (_osmode == DOS_MODE)
     {
         union REGS regs;
+        static unsigned short counter = 0;
+        if (counter % 10 == 0)
+        {
+            opsysTimeSlice();
+        }
+        counter++;
         regs.h.ah = 0x01;
         _int86(0x16, &regs, &regs);
         return !(regs.x.flags & 0x40);
@@ -216,7 +228,7 @@ int vm_getch(void)
 
         while (!vm_kbhit())
         {
-            /* do nothing for now - may share time slices in later versions */
+            /* nada */
         }
 
         vm_getkey(&chScan, &chChar);
@@ -275,7 +287,8 @@ int vm_getch(void)
     {
         KBDKEYINFO ki;
 
-        ki.chChar = ki.chScan = 0;
+        ki.chChar = 0;
+        ki.chScan = 0;
         KbdCharIn(&ki, IO_WAIT, 0);
 
         if (ki.chChar == 0xe0)
@@ -389,43 +402,45 @@ void vm_setcursorstyle(int style)
 {
     if (_osmode == DOS_MODE)
     {
-        switch (style)
+        if (vm_iscolorcard())
         {
-        case CURSORHALF:
-            if (vm_iscolorcard())
+            switch (style)
             {
+            case CURSORHALF:
                 vm_setcursorsize(4, 7);
-            }
-            else
-            {
-                vm_setcursorsize(8, 13);
-            }
-            break;
-        case CURSORFULL:
-            if (vm_iscolorcard())
-            {
+                break;
+            case CURSORFULL:
                 vm_setcursorsize(0, 7);
-            }
-            else
-            {
-                vm_setcursorsize(0, 13);
-            }
-            break;
-        case CURSORNORM:
-            if (vm_iscolorcard())
-            {
+                break;
+            case CURSORNORM:
                 vm_setcursorsize(7, 8);
+                break;
+            case CURSORHIDE:
+                v_hidecursor();
+                break;
+            default:
+                break;
             }
-            else
+        }
+        else
+        {
+            switch (style)
             {
+            case CURSORHALF:
+                vm_setcursorsize(8, 13);
+                break;
+            case CURSORFULL:
+                vm_setcursorsize(0, 13);
+                break;
+            case CURSORNORM:
                 vm_setcursorsize(11, 13);
+                break;
+            case CURSORHIDE:
+                vm_setcursorsize(32, 32);
+                break;
+            default:
+                break;
             }
-            break;
-        case CURSORHIDE:
-            v_hidecursor();
-            break;
-        default:
-            break;
         }
     }
     else
