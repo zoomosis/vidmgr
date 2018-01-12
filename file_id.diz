@@ -1,5 +1,6 @@
-VidMgr 1.1 provides a set of screen drawing,
-cursor and keyboard routines for text mode
-MS-DOS, OS/2 and Windows NT applications.  Full
-source code included.  Written by Andrew Clarke
-and released to the public domain in June 1996.
+VidMgr 1.2 provides a set of screen drawing,
+cursor and keyboard routines for text mode MS-DOS,
+OS/2 and Windows 95/NT applications.  Full source
+code included.  Written by Andrew Clarke and
+released to the public domain in July 1996.
+
