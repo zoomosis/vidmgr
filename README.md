@@ -28,6 +28,10 @@ Windows NT module, vmgrwnt.c, now supports the Ctrl+Left and
 Ctrl+Right key combinations.
 
 
+### Documentation ###
+
+Basic documentation is provided in the file [vidmgr.md](vidmgr.md).
+
 ### Supported compilers ###
 
 The following compilers have been tested building the VidMgr library:
