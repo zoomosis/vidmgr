@@ -1,4 +1,4 @@
-# Makefile for DJGPP for DOS 2.0
+# Makefile for DJGPP GNU C/C++ for DOS 2.0
 
 all: qmenu32.exe
 
@@ -10,7 +10,8 @@ COPTS=-O2
 objs=qmenu.o    \
      vidmgr.o   \
      vmgrdjgp.o  \
-     vioimage.o  
+     vioimage.o  \
+     opsys.o
 
 qmenu32.exe: $(objs)
   gcc $(COPTS) -s -Wall -o qmenu32.exe $(objs)
