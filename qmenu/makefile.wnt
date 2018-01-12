@@ -1,4 +1,4 @@
-# Makefile for WATCOM C/C++ for Windows NT 10.0
+# Makefile for WATCOM C/C++ for Windows 95/NT 10.0
 
 all: qmenuw32.exe
 
