@@ -1,4 +1,4 @@
-# Makefile for EMX for OS/2 0.9b
+# Makefile for EMX GNU C/C++ for OS/2 0.9b
 
 all: qmenup.exe
 
