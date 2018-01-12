@@ -1,5 +1,6 @@
 /*
  *  VIOIMAGE.C; VidMgr routines for saving and restoring text images.
+ *              Release 1.2.
  *
  *  This module written in May 1996 by Andrew Clarke and released to the
  *  public domain.
