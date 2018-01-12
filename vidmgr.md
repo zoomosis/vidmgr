@@ -1,4 +1,4 @@
-VidMgr documentation
+### VidMgr documentation ###
 
 Written by Andrew Clarke in May 2002.
 
