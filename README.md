@@ -27,10 +27,15 @@ vm_cleareol(), vm_paintcleareol() and vm_filleol() functions. The
 Windows NT module, vmgrwnt.c, now supports the Ctrl+Left and
 Ctrl+Right key combinations.
 
-
 ### Documentation ###
 
 Basic documentation is provided in the file [vidmgr.md](vidmgr.md).
+
+### Example code ###
+
+Included in the source code is [QuickMenu](qmenu), a simple text
+mode program that displays a menu to the user and allow them to
+run other programs.
 
 ### Supported compilers ###
 
