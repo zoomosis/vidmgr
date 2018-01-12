@@ -1,5 +1,5 @@
 /*
- *  VMGROS2.C; VidMgr module for OS/2 compilers.
+ *  VMGROS2.C; VidMgr module for OS/2 compilers.  Release 1.2.
  *
  *  This module written in March 1996 by Andrew Clarke and released to the
  *  public domain.  Last modified in May 1996.
@@ -111,7 +111,8 @@ int vm_getch(void)
 {
     KBDKEYINFO ki;
 
-    ki.chChar = ki.chScan = 0;
+    ki.chChar = 0;
+    ki.chScan = 0;
     KbdCharIn(&ki, IO_WAIT, 0);
 
     if (ki.chChar == 0xe0)
