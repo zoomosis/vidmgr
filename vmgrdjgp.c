@@ -1,5 +1,5 @@
 /*
- *  VMGRDJGP.C; VidMgr module for the DJGPP compiler.
+ *  VMGRDJGP.C; VidMgr module for the DJGPP GNU C/C++ compiler.  Release 1.2.
  *
  *  This module written in May 1996 by Andrew Clarke and released to the
  *  public domain.
@@ -9,6 +9,7 @@
 #include <go32.h>
 #include <sys/farptr.h>
 #include "vidmgr.h"
+#include "opsys.h"
 
 static int vm_iscolorcard(void);
 static char vm_getscreenmode(void);
@@ -22,6 +23,7 @@ void vm_init(void)
 {
     vm_getinfo(&vm_startup);
     vm_setattr(vm_startup.attr);
+    opsysDetect();
 }
 
 void vm_done(void)
@@ -59,7 +61,7 @@ static void vm_setscreenmode(char mode)
     union REGS regs;
     regs.h.ah = 0x00;
     regs.h.al = mode;
-    int386(0x10, &regs, &regs);
+    int86(0x10, &regs, &regs);
 }
 
 char vm_getscreenwidth(void)
@@ -84,7 +86,7 @@ void vm_gotoxy(char x, char y)
     regs.h.bh = 0;
     regs.h.dh = (unsigned char)(y - 1);
     regs.h.dl = (unsigned char)(x - 1);
-    int386(0x10, &regs, &regs);
+    int86(0x10, &regs, &regs);
 }
 
 char vm_wherex(void)
@@ -103,7 +105,7 @@ static void vm_setcursorsize(char start, char end)
     regs.h.ah = 0x01;
     regs.h.ch = start;
     regs.h.cl = end;
-    int386(0x10, &regs, &regs);
+    int86(0x10, &regs, &regs);
 }
 
 static void vm_getcursorsize(char *start, char *end)
@@ -111,7 +113,7 @@ static void vm_getcursorsize(char *start, char *end)
     union REGS regs;
     regs.h.ah = 0x03;
     regs.h.bh = 0;
-    int386(0x10, &regs, &regs);
+    int86(0x10, &regs, &regs);
     *start = regs.h.ch;
     *end = regs.h.cl;
 }
@@ -119,16 +121,22 @@ static void vm_getcursorsize(char *start, char *end)
 int vm_kbhit(void)
 {
     union REGS regs;
+    static unsigned short counter = 0;
+    if (counter % 10 == 0)
+    {
+        opsysTimeSlice();
+    }
+    counter++;
     regs.h.ah = 0x01;
-    int386(0x16, &regs, &regs);
-    return !(regs.w.cflag & 0x40);
+    int86(0x16, &regs, &regs);
+    return !(regs.x.flags & 0x40);
 }
 
 static void vm_getkey(unsigned char *chScan, unsigned char *chChar)
 {
     union REGS regs;
     regs.h.ah = 0x00;
-    int386(0x16, &regs, &regs);
+    int86(0x16, &regs, &regs);
     *chScan = regs.h.ah;
     *chChar = regs.h.al;
 }
@@ -139,7 +147,7 @@ int vm_getch(void)
 
     while (!vm_kbhit())
     {
-        /* do nothing for now - may share time slices in later versions */
+        /* nada */
     }
 
     vm_getkey(&chScan, &chChar);
@@ -197,80 +205,88 @@ int vm_getch(void)
 
 void vm_setcursorstyle(int style)
 {
-    switch (style)
+    if (vm_iscolorcard())
     {
-    case CURSORHALF:
-        if (vm_iscolorcard())
+        switch (style)
         {
+        case CURSORHALF:
             vm_setcursorsize(4, 7);
-        }
-        else
-        {
-            vm_setcursorsize(8, 13);
-        }
-        break;
-    case CURSORFULL:
-        if (vm_iscolorcard())
-        {
+            break;
+        case CURSORFULL:
             vm_setcursorsize(0, 7);
-        }
-        else
-        {
-            vm_setcursorsize(0, 13);
-        }
-        break;
-    case CURSORNORM:
-        if (vm_iscolorcard())
-        {
+            break;
+        case CURSORNORM:
             vm_setcursorsize(7, 8);
+            break;
+        case CURSORHIDE:
+            vm_setcursorsize(32, 32);
+            break;
+        default:
+            break;
         }
-        else
+    }
+    else
+    {
+        switch (style)
         {
+        case CURSORHALF:
+            vm_setcursorsize(8, 13);
+            break;
+        case CURSORFULL:
+            vm_setcursorsize(0, 13);
+            break;
+        case CURSORNORM:
             vm_setcursorsize(11, 13);
+            break;
+        case CURSORHIDE:
+            vm_setcursorsize(32, 32);
+            break;
+        default:
+            break;
         }
-        break;
-    case CURSORHIDE:
-        vm_setcursorsize(32, 32);
-        break;
-    default:
-        break;
     }
 }
 
 static unsigned long vm_screenaddress(char x, char y)
 {
+    unsigned short base;
     if (vm_iscolorcard())
     {
-        return (unsigned long)((0xb800 << 4) + ((y - 1) * vm_getscreenwidth() * 2) + ((x - 1) * 2));
+        base = opsysGetVideoSeg(0xB800);
     }
     else
     {
-        return (unsigned long)((0xb000 << 4) + ((y - 1) * vm_getscreenwidth() * 2) + ((x - 1) * 2));
+        base = opsysGetVideoSeg(0xB000);
     }
+    return (unsigned long)((base << 4) + ((y - 1) * vm_getscreenwidth() * 2) + ((x - 1) * 2));
 }
 
 char vm_getchxy(char x, char y)
 {
-    unsigned long address = vm_screenaddress(x, y);
+    unsigned long address;
+    address = vm_screenaddress(x, y);
     return (char)_farpeekb(_go32_conventional_mem_selector(), address);
 }
 
 char vm_getattrxy(char x, char y)
 {
-    unsigned long address = vm_screenaddress(x, y);
+    unsigned long address;
+    address = vm_screenaddress(x, y);
     return (char)_farpeekb(_go32_conventional_mem_selector(), address + 1L);
 }
 
 void vm_xgetchxy(char x, char y, char *attr, char *ch)
 {
-    unsigned long address = vm_screenaddress(x, y);
+    unsigned long address;
+    address = vm_screenaddress(x, y);
     *ch = (char)_farpeekb(_go32_conventional_mem_selector(), address);
     *attr = (char)_farpeekb(_go32_conventional_mem_selector(), address + 1L);
 }
 
 void vm_putch(char x, char y, char ch)
 {
-    unsigned long address = vm_screenaddress(x, y);
+    unsigned long address;
+    address = vm_screenaddress(x, y);
     _farpokeb(_go32_conventional_mem_selector(), address, ch);
 }
 
@@ -280,7 +296,8 @@ void vm_puts(char x, char y, char *str)
     ofs = 0;
     while (*str)
     {
-        unsigned long address = vm_screenaddress(x + ofs, y);
+        unsigned long address;
+        address = vm_screenaddress(x + ofs, y);
         _farpokeb(_go32_conventional_mem_selector(), address, *str);
         str++;
         ofs++;
@@ -289,7 +306,8 @@ void vm_puts(char x, char y, char *str)
 
 void vm_xputch(char x, char y, char attr, char ch)
 {
-    unsigned long address = vm_screenaddress(x, y);
+    unsigned long address;
+    address = vm_screenaddress(x, y);
     _farpokeb(_go32_conventional_mem_selector(), address, ch);
     _farpokeb(_go32_conventional_mem_selector(), address + 1L, attr);
 }
@@ -300,7 +318,8 @@ void vm_xputs(char x, char y, char attr, char *str)
     ofs = 0;
     while (*str)
     {
-        unsigned long address = vm_screenaddress(x + ofs, y);
+        unsigned long address;
+        address = vm_screenaddress(x + ofs, y);
         _farnspokeb(address, *str);
         _farnspokeb(address + 1L, attr);
         str++;
@@ -310,7 +329,8 @@ void vm_xputs(char x, char y, char attr, char *str)
 
 void vm_putattr(char x, char y, char attr)
 {
-    unsigned long address = vm_screenaddress(x, y);
+    unsigned long address;
+    address = vm_screenaddress(x, y);
     _farpokeb(_go32_conventional_mem_selector(), address + 1L, attr);
 }
 
