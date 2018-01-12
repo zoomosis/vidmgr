@@ -1,8 +1,8 @@
 /*
- *  VMGRDOS.C  VidMgr module for MS-DOS compilers.  Release 1.2.
+ *  VMGRDOS.C  VidMgr module for MS-DOS compilers.  Release 1.3.
  *
  *  This module written in March 1996 by Andrew Clarke and released to the
- *  public domain.  Last modified in June 1996.
+ *  public domain.  Last modified in October 1996.
  */
 
 #include <string.h>
@@ -243,7 +243,7 @@ int vm_kbhit(void)
         opsysTimeSlice();
     }
     counter++;
-#if defined(_MSC_VER) || defined(_QC)
+#if defined(_MSC_VER) || defined(_QC) || defined(__SC__)
     _asm
     {
     	mov    ah,0x01
