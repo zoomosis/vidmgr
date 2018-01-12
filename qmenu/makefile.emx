@@ -1,4 +1,4 @@
-# Makefile for EMX for OS/2 & DOS 0.9b
+# Makefile for EMX GNU C/C++ for OS/2 & DOS 0.9b
 
 all: qmenup.exe
 
@@ -11,7 +11,8 @@ COPTS=-O2
 objs=qmenu.o    \
      vidmgr.o   \
      vmgremx.o  \
-     vioimage.o  
+     vioimage.o \
+     opsys.o
 
 qmenup.exe: $(objs)
   gcc $(COPTS) -s -Wall -o qmenup.exe $(objs) $(LIBDIR)/video.a
