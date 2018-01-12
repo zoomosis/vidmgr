@@ -1,12 +1,14 @@
 /*
- *  VMGRDOS.C  VidMgr module for MS-DOS compilers.
+ *  VMGRDOS.C  VidMgr module for MS-DOS compilers.  Release 1.2.
  *
- *  This module written by in March 1996 by Andrew Clarke and released to the
+ *  This module written in March 1996 by Andrew Clarke and released to the
  *  public domain.  Last modified in June 1996.
  */
 
+#include <string.h>
 #include <dos.h>
 #include "vidmgr.h"
+#include "opsys.h"
 
 #if defined(__POWERC) || (defined(__TURBOC__) && !defined(__BORLANDC__)) || \
   (defined(__ZTC__) && !defined(__SC__))
@@ -35,6 +37,7 @@ void vm_init(void)
 {
     vm_getinfo(&vm_startup);
     vm_setattr(vm_startup.attr);
+    opsysDetect();
 }
 
 void vm_done(void)
@@ -69,11 +72,11 @@ char *vm_screenptr(char x, char y)
     char *ptr;
     if (vm_iscolorcard())
     {
-        ptr = (char *)(0xb800 << 4);
+        ptr = (char *)(opsysGetVideoSeg(0xB800) << 4);
     }
     else
     {
-        ptr = (char *)(0xb000 << 4);
+        ptr = (char *)(opsysGetVideoSeg(0xB000) << 4);
     }
     return ptr + (y * vm_getscreenwidth() * 2) + (x * 2);
 }
@@ -85,11 +88,11 @@ char FAR *vm_screenptr(char x, char y)
     char FAR *ptr;
     if (vm_iscolorcard())
     {
-        ptr = (char FAR *)MK_FP(0xb800, 0x0000);
+        ptr = (char FAR *)MK_FP(opsysGetVideoSeg(0xB800), 0x0000);
     }
     else
     {
-        ptr = (char FAR *)MK_FP(0xb000, 0x0000);
+        ptr = (char FAR *)MK_FP(opsysGetVideoSeg(0xB000), 0x0000);
     }
     return ptr + (y * vm_getscreenwidth() * 2) + (x * 2);
 }
@@ -234,20 +237,34 @@ static void vm_getcursorsize(char *start, char *end)
 
 int vm_kbhit(void)
 {
-#if defined(__TURBOC__)
+    static unsigned short counter = 0;
+    if (counter % 10 == 0)
+    {
+        opsysTimeSlice();
+    }
+    counter++;
+#if defined(_MSC_VER) || defined(_QC)
+    _asm
+    {
+    	mov    ah,0x01
+    	int    16h
+    	jz     nokey
+    }
+    return 1;
+nokey:
+    return 0;
+#elif defined(__TURBOC__)
     _AH = 0x01;
     geninterrupt(0x16);
     return !(_FLAGS & 0x40);
 #else
-    union REGS regs;
-    regs.h.ah = 0x01;
-#if defined(__WATCOMC__) && defined(__386__)
-    int386(0x16, &regs, &regs);
-    return !(regs.w.cflag & 0x40);
-#else
-    int86(0x16, &regs, &regs);
-    return !(regs.x.cflag & 0x40);
-#endif
+    {
+        union REGPACK regpack;
+        memset(&regpack, 0, sizeof regpack);
+        regpack.h.ah = 0x01;
+        intr(0x16, &regpack);
+        return !(regpack.x.flags & 0x40);
+    }
 #endif
 }
 
@@ -277,7 +294,7 @@ int vm_getch(void)
 
     while (!vm_kbhit())
     {
-        /* do nothing for now - may share time slices in later versions */
+        /* nada */
     }
 
     vm_getkey(&chScan, &chChar);
@@ -335,43 +352,45 @@ int vm_getch(void)
 
 void vm_setcursorstyle(int style)
 {
-    switch (style)
+    if (vm_iscolorcard())
     {
-    case CURSORHALF:
-        if (vm_iscolorcard())
+        switch (style)
         {
+        case CURSORHALF:
             vm_setcursorsize(4, 7);
-        }
-        else
-        {
-            vm_setcursorsize(8, 13);
-        }
-        break;
-    case CURSORFULL:
-        if (vm_iscolorcard())
-        {
+            break;
+        case CURSORFULL:
             vm_setcursorsize(0, 7);
-        }
-        else
-        {
-            vm_setcursorsize(0, 13);
-        }
-        break;
-    case CURSORNORM:
-        if (vm_iscolorcard())
-        {
+            break;
+        case CURSORNORM:
             vm_setcursorsize(7, 8);
+            break;
+        case CURSORHIDE:
+            vm_setcursorsize(32, 32);
+            break;
+        default:
+            break;
         }
-        else
+    }
+    else
+    {
+        switch (style)
         {
+        case CURSORHALF:
+            vm_setcursorsize(8, 13);
+            break;
+        case CURSORFULL:
+            vm_setcursorsize(0, 13);
+            break;
+        case CURSORNORM:
             vm_setcursorsize(11, 13);
+            break;
+        case CURSORHIDE:
+            vm_setcursorsize(32, 32);
+            break;
+        default:
+            break;
         }
-        break;
-    case CURSORHIDE:
-        vm_setcursorsize(32, 32);
-        break;
-    default:
-        break;
     }
 }
 
@@ -447,7 +466,9 @@ void vm_paintclearbox(char x1, char y1, char x2, char y2, char attr)
     for (y = y1; y <= y2; y++)
     {
         for (x = x1; x <= x2; x++)
+        {
             vm_xputch(x, y, attr, ' ');
+        }
     }
 }
 
