@@ -2,7 +2,6 @@
 
 all: qmenup.exe
 
-LIBDIR=/emx/lib
 COPTS=-O2
 
 .c.o:
@@ -15,5 +14,5 @@ objs=qmenu.o    \
      opsys.o
 
 qmenup.exe: $(objs)
-  gcc $(COPTS) -s -Wall -o qmenup.exe $(objs) $(LIBDIR)/video.a
+  gcc $(COPTS) -s -Wall -o qmenup.exe $(objs) -lvideo
   emxbind -aq qmenup.exe -acm
