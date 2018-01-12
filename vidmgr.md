@@ -1,23 +1,18 @@
-VidMgr 1.3 documentation
-Revision 1.1
-Written by Andrew Clarke
-¸ Copyright May 2002
+VidMgr documentation
+
+Written by Andrew Clarke in May 2002.
 
 
 The following document describes version 1.3 of the VidMgr library as
 written by the author, Andrew Clarke, in October 1996. VidMgr
 provides a set of public domain screen drawing, cursor and keyboard
 routines for text mode DOS, OS/2 and 32-bit Windows 9x/NT
-applications.  Full source code is included in the ZIP archive (named
-vidmgr13.zip).
-
-You may contact the author via Internet e-mail at randy@zws.com for
-any comments or questions about this document.  Corrections and
-additions are welcome.
+applications.
 
 
-
+```C
 void vm_init(void);
+```
 
 This initialises the VidMgr subsystem.  This function should be
 called before any other function contained in the VidMgr library.  If
@@ -27,7 +22,9 @@ vm_init().  No value is returned from the function, so it is assumed
 that the call succeeded.
 
 
+```C
 void vm_done(void);
+```
 
 Exits the VidMgr subsystem.  This function should be called when your
 application exits, or often when you wish to run an external
@@ -35,7 +32,9 @@ application (eg. before calling system()).  Success is assumed and no
 value is returned.
 
 
+```C
 char vm_getscreenwidth(void);
+```
 
 Returns a value equal to the width of the screen in columns.  On DOS,
 OS/2 and Windows systems the value returned is commonly 80.  (Note
@@ -43,7 +42,9 @@ that screens wider than 255 characters, while uncommon, are not
 supported.)
 
 
+```C
 char vm_getscreenheight(void);
+```
 
 Returns a value equal to the height of the screen in rows.  On DOS,
 OS/2 and Windows systems the value returned is commonly 25.  (Note
@@ -51,7 +52,9 @@ that screens deeper than 255 rows, while uncommon, are not
 supported.)
 
 
+```C
 short vm_getscreensize(void);
+```
 
 Returns a value equal to the amount of memory required to hold all
 the information currently contained on the screen.  For a screen 80
@@ -59,31 +62,40 @@ columns wide and 25 rows (or lines) high, the value returned is
 4,000.  This function is deprecated and may be removed from future
 versions of VidMgr.  In any case, it can be calculated using:
 
-     size = vm_getscreenwidth() * vm_getscreenheight() * 2;
+```C
+size = vm_getscreenwidth() * vm_getscreenheight() * 2;
+```
 
-
+```C
 void vm_gotoxy(char x, char y);
+```
 
 Positions the text cursor at column x, row y.  A coordinate of 1, 1
 points to the upper-left hand side of the screen.  No value is
 returned.
 
 
+```C
 char vm_wherex(void);
+```
 
 Returns a value equal to the X (column) position of the text cursor.
 A value of 1 points to the far-left hand side of the screen.  Columns
 beyond 255 are not supported.
 
 
+```C
 char vm_wherey(void);
+```
 
 Returns a value equal to the Y (row) position of the text cursor.  A
 value of 1 points to the top of the screen.  Rows beyond 255 are not
 supported.
 
 
+```C
 int vm_kbhit(void);
+```
 
 Returns a non-zero value if a key on the keyboard was pressed.  This
 may exclude some shift (Ctrl, Alt, Shift) and other function keys on
@@ -94,7 +106,9 @@ running concurrently.  Support for timeslicing under Novell Netware
 and DoubleDOS is also provided, but this is untested.
 
 
+```C
 int vm_getch(void);
+```
 
 Waits for a key to be pressed on the keyboard and returns its value.
 See Table 1.1 and Table 1.1.1 for a list of keycode values returned
@@ -141,10 +155,12 @@ by this function.
          '|' '\' ';' ':' '\''
          '"' '<' '>' ',' '.'
                '?' '/'
+    
+    
+
     Table 1.1.1: Extended keycode values returned by vm_getch().
                                   
-The following are 'extended' keycodes and may not be available on all
-                              systems:
+    The following are 'extended' keycodes and may not be available on all systems:
                                   
             Keycode (hex)              Description
                                              
@@ -234,12 +250,16 @@ The following are 'extended' keycodes and may not be available on all
                 0xa000                Alt+Down arrow
 
 
+```C
 #define vm_mkcolor(fore, back)
+```
 
 A macro that generates video attribute values compatible with VidMgr,
 based on a foreground and background color pair, eg.
 
-     vm_mkcolor(LIGHTCYAN, BLUE)
+```C
+vm_mkcolor(LIGHTCYAN, BLUE)
+```
 
 Refer to Table 1.2 for a list of video attributes that can be used
 with this function.  vm_mkcolour() iis a synonym for vm_mkcolor() for
@@ -271,190 +291,244 @@ non-American English programmers.
                 WHITE                      0x0f
 
 
+```C
 #define vm_fore(attr)
+```
 
-A macro that returns the foreground color of a video attribute pair,
-eg.
-
+A macro that returns the foreground color of a video attribute pair, eg.
+```C
      vm_fore(vm_mkcolor(LIGHTCYAN, BLUE))  /* returns LIGHTCYAN */
+```
 
-
+```C
 #define vm_back(attr)
+```
 
-A macro that returns the background color of a video attribute pair,
-eg.
+A macro that returns the background color of a video attribute pair, eg.
 
-     vm_back(vm_mkcolor(LIGHTCYAN, BLUE))  /* returns BLUE */
+```C
+vm_back(vm_mkcolor(LIGHTCYAN, BLUE))  /* returns BLUE */
+```
 
-
+```C
 void vm_paintclearbox(char x1, char y1, char x2, char y2, char attr);
+```
 
 Fills a box on the screen with the attr video attribute and clears
 its contents.  The location of the text cursor remains fixed.  The
 value of the video attribute can be generated using the vm_mkcolor()
 macro, eg.
-
-     vm_paintclearbox(20, 5, 60, 20, vm_mkcolor(LIGHTCYAN, BLUE));
-
+```C
+vm_paintclearbox(20, 5, 60, 20, vm_mkcolor(LIGHTCYAN, BLUE));
+```
 will place a box on the screen with a light cyan foreground and a
 blue background and clear its contents.
 
 
+```C
 void vm_paintclearscreen(char attr);
+```
 
 Fills the screen with the attr video attribute and clears its
 contents.  The location of the text cursor remains fixed.
 
 
+```C
 void vm_paintclearline(char row, char attr);
+```
 
 Fills a row on the screen with the attr video attribute and clears
 its contents.  The location of the text cursor remains fixed.
 
 
+```C
 void vm_paintcleareol(char row, char attr);
+```
 
 Fills a row on the screen beginning at the current X location of the
 text cursor with the attr video attribute and clears its contents.
 The location of the text cursor remains fixed.
 
 
+```C
 void vm_paintbox(char x1, char y1, char x2, char y2, char attr);
+```
 
 Fills a box on the screen with the attr video attribute.  The
 location of the text cursor remains fixed.  vm_attrib() is a synonym
 for vm_paintbox().
 
 
+```C
 void vm_paintscreen(char attr);
+```
 
 Fills the screen with the attr video attribute.  The location of the
 text cursor remains fixed.
 
 
+```C
 void vm_paintline(char row, char attr);
+```
 
 Fills a row on the screen with the attr video attribute.  The
 location of the text cursor remains fixed.
 
 
+```C
 void vm_painteol(char row, char attr);
+```
 
 Fills a row on the screen beginning at the current X location of the
 text cursor with the attr video attribute.  The location of the text
 cursor remains fixed.
 
 
+```C
 void vm_clearbox(char x1, char y1, char x2, char y2);
+```
 
 Clears a box on the screen using the current color video attribute.
 The location of the text cursor remains fixed.
 
 
+```C
 void vm_clearscreen(void);
+```
 
 Clears the screen using the current color video attribute.  The
 location of the text cursor remains fixed.
 
 
+```C
 void vm_clearline(char row);
+```
 
 Clears a row on the screen using the current color video attribute.
 The location of the text cursor remains fixed.
 
 
+```C
 void vm_cleareol(char row);
+```
 
 Clears a row on the screen beginning at the current X location of the
 text cursor using the current color video attribute.  The location of
 the text cursor remains fixed.
 
 
+```C
 void vm_fillbox(char x1, char y1, char x2, char y2, char ch);
+```
 
 Fills a box on the screen with the character ch using the current
 color video attribute.  The location of the text cursor remains
 fixed.
 
 
+```C
 void vm_fillscreen(char ch);
+```
 
 Fills the screen with the character ch using the current color video
 attribute.  The location of the text cursor remains fixed.
 
 
+```C
 void vm_fillline(char row, char ch);
+```
 
 Fills a row on the screen with the character ch using the current
 color video attribute.  The location of the text cursor remains
 fixed.
 
 
+```C
 void vm_filleol(char row);
+```
 
 Fills a row on the screen with the character ch beginning at the
 current X location of the text cursor using the current video
 attribute.  The location of the text cursor remains fixed.
 
 
+```C
 void vm_clrscr(void);
-
+```
 Clears the screen using the current video attribute and moves the
 text cursor to the upper-left hand corner of the screen.
 
 
+```C
 void vm_clreol(void);
+```
 
 Clears all characters on the current row beginning at the current X
 location of the text cursor using the current video attribute.  The
 location of the text cursor remains fixed.
 
 
+```C
 char vm_getchxy(char x, char y);
+```
 
 Returns the character on the screen at the coordinate x, y.
 
 
+```C
 char vm_getattrxy(char x, char y);
+```
 
 Returns the video attribute on the screen at the coordinate x, y.
 
 
+```C
 void vm_xgetchxy(char x, char y, char *attr, char *ch);
+```
 
 Returns both the video attribute and character on the screen at the
 coordinate x, y.
 
 
+```C
 void vm_setattr(char attr);
+```
 
 Sets the current video attribute to be used to be used next, for
 functions where no video attribute value may be specified (eg.
 vm_putch()).
 
 
+```C
 void vm_putattr(char x, char y, char attr);
+```
 
 Sets the video attribute on the screen at the coordinate x, y.  The
 character at that location, and the location of the text cursor both
 remain fixed.
 
 
+```C
 void vm_putch(char x, char y, char ch);
+```
 
 Displays a character on the screen at the coordinate x, y.  The
 previous character at that location is overwritten.  The location of
 the text cursor remains fixed.
 
 
+```C
 void vm_puts(char x, char y, char *str);
+```
 
 Displays a string on the screen at the coordinate x, y.  The previous
 text at that location is overwritten.  The location of the text
 cursor remains fixed.
 
 
+```C
 void vm_printf(char x, char y, const char *format, ...);
+```
 
 Displays a string on the screen at the coordinate x, y using
 formatted output.  The previous text at that location is overwritten.
@@ -462,21 +536,27 @@ The location of the text cursor remains fixed.  This function is
 deprecated and may be removed from future versions of VidMgr.
 
 
+```C
 void vm_xputch(char x, char y, char attr, char ch);
+```
 
 Displays a character on the screen at the coordinate x, y using the
 video attribute attr.  The previous character at that location is
 overwritten.  The location of the text cursor remains fixed.
 
 
+```C
 void vm_xputs(char x, char y, char attr, char *str);
+```
 
 Displays a string on the screen at the coordinate x, y using the
 video attribute attr.  The previous text at that location is
 overwritten.  The location of the text cursor remains fixed.
 
 
+```C
 void vm_xprintf(char x, char y, char attr, const char *format, ...);
+```
 
 Displays a string on the screen at the coordinate x, y using the
 video attribute attr and formatted output.  The previous text at that
@@ -485,7 +565,9 @@ fixed.  This function is deprecated and may be removed from future
 versions of VidMgr.
 
 
+```C
 void vm_gettext(char x1, char y1, char x2, char y2, char *dest);
+```
 
 Copies the text and video attributes from a box on the screen to
 memory.  The memory required to store a copy of the box is equal to
@@ -493,12 +575,16 @@ width x height x 2.  For a box 80 columns wide and 25 rows (or lines)
 high, 4,000 bytes of memory are required.
 
 
+```C
 void vm_puttext(char x1, char y1, char x2, char y2, char *srce);
+```
 
 Copies the text and video attributes from memory to the screen.
 
 
+```C
 void vm_setcursorstyle(int style);
+```
 
 Sets the size of the text cursor, where supported.  See Table 1.3 for
 a list of cursor style values that may be used with this function.
@@ -518,16 +604,15 @@ a list of cursor style values that may be used with this function.
                                        solid block
 
 
+```C
 void vm_printfcenter(char row, const char *format, ...);
-void vm_printfbetween(char x1, char x2, char row, const char *format,
-...);
+void vm_printfbetween(char x1, char x2, char row, const char *format, ...);
 void vm_xprintfcenter(char row, char attr, const char *format, ...);
-void vm_xprintfbetween(char x1, char x2, char row, char attr, const
-char *format, ...);
+void vm_xprintfbetween(char x1, char x2, char row, char attr, const char *format, ...);
 void vm_horizline(char x1, char x2, char row, char attr, char ch);
 void vm_vertline(char y1, char y2, char col, char attr, char ch);
-void vm_frame(char x1, char y1, char x2, char y2, char attr, char
-*frame);
+void vm_frame(char x1, char y1, char x2, char y2, char attr, char *frame);
+```
 
-These functions are currently undocumented.  These functions are
-deprecated and may be removed from future versions of VidMgr.
+These functions are currently undocumented, are deprecated, and may
+be removed from future versions of VidMgr.
