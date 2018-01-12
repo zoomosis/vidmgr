@@ -1,5 +1,5 @@
 
-               VidMgr 1.2 Read Me   Released July 11, 1996
+            VidMgr 1.3 README.TXT   Released October 3, 1996
 
 
 INTRODUCTION
@@ -19,17 +19,22 @@ MS-DOS programs compiled with EMX.  A Windows 95/NT module was
 also added.
 
 Version 1.2, the second public release of the VidMgr library,
-provides support for internal "timeslicing" (CPU sharing) when
+provided support for internal "timeslicing" (CPU sharing) when
 polling the keyboard using the vm_kbhit() function in an MS-DOS
 application.  VidMgr now also supports the DESQview "video
 buffer", although this has not been tested very thoroughly.  The
 C source for these functions can be found in OPSYS.C.  Bug
 reports and additional code welcome, as always.
 
-Version 1.2 of VidMgr also contains a few minor modifications to
+Version 1.2 of VidMgr also contained a few minor modifications to
 allow compilation using the Cygnus GNU C compiler for Windows
 95/NT.  More information on this Freeware C compiler can be found
 at http://www.cygnus.com/ml/gnu-win32/.
+
+Version 1.3 corrects a number of minor bugs in the vm_painteol,
+vm_cleareol, vm_paintcleareol and vm_filleol functions.  The
+Windows NT module, VMGRWNT.C, now supports the Ctrl+Left and
+Ctrl+Right key combinations.
 
 
 SOURCE
@@ -91,6 +96,4 @@ OBTAINING VIDMGR
 
 The latest release of VidMgr is available for FREQ from FidoNet
 nodes 3:635/727 or 3:635/728, and can be downloaded via Internet
-FTP from snoopy.apana.org.au in the /pub/blizzard directory.  The
-archive name for VidMgr release 1.2 is VIDMGR12.ZIP; the archive
-name for VidMgr release 1.3 will be named VIDMGR13.ZIP, and so on.
+FTP from snoopy.apana.org.au, from the /pub/blizzard/ directory.
