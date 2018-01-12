@@ -1,19 +1,25 @@
 /*
- *  VMGRWNT.C; VidMgr module for Windows NT compilers.
+ *  VMGRWNT.C; VidMgr module for Windows 95/NT compilers.  Release 1.2.
  *
  *  This module written in May 1996 by Andrew Clarke and released to the
- *  public domain.
+ *  public domain.  Last modified in July 1996.
  */
 
 #include <stdlib.h>
 #include <string.h>
+
 #define WIN32_LEAN_AND_MEAN
+
 #include <windows.h>
 #include "vidmgr.h"
 
+#ifdef __CYGWIN32__
+typedef WORD far *LPWORD;
+#endif
+
 static HANDLE HInput = INVALID_HANDLE_VALUE;
 static HANDLE HOutput = INVALID_HANDLE_VALUE;
-static ULONG key_hit = 0xFFFFFFFFUL;
+static unsigned long key_hit = 0xFFFFFFFFUL;
 
 static int video_init = 0;
 
@@ -115,7 +121,7 @@ int vm_kbhit(void)
     if (key_hit != 0xFFFFFFFFUL)
         return (int)key_hit;
 
-    ZeroMemory(&irBuffer, sizeof irBuffer);
+    memset(&irBuffer, 0, sizeof irBuffer);
 
     if (WaitForSingleObject(HInput, 0L) == 0)
     {
@@ -129,7 +135,11 @@ int vm_kbhit(void)
 
             vk = irBuffer.Event.KeyEvent.wVirtualKeyCode;
             vs = irBuffer.Event.KeyEvent.wVirtualScanCode;
+#ifdef __CYGWIN32__
+            uc = irBuffer.Event.KeyEvent.AsciiChar;
+#else
             uc = irBuffer.Event.KeyEvent.uChar.AsciiChar;
+#endif
 
             fShift = (irBuffer.Event.KeyEvent.dwControlKeyState & (SHIFT_PRESSED));
             fAlt = (irBuffer.Event.KeyEvent.dwControlKeyState & (RIGHT_ALT_PRESSED + LEFT_ALT_PRESSED));
@@ -308,8 +318,7 @@ void vm_xputch(char x, char y, char attr, char ch)
 
 void vm_xputs(char x, char y, char attr, char *str)
 {
-    int i;
-    DWORD len;
+    DWORD i, len;
     COORD coord;
     LPWORD pwattr;
     pwattr = malloc(strlen(str) * sizeof(*pwattr));
@@ -341,11 +350,10 @@ void vm_putattr(char x, char y, char attr)
 
 void vm_paintclearbox(char x1, char y1, char x2, char y2, char attr)
 {
-    int i;
     COORD coord;
     LPWORD pwattr;
     char y, *pstr;
-    DWORD len, width;
+    DWORD i, len, width;
     width = (x2 - x1 + 1);
     pwattr = malloc(width * sizeof(*pwattr));
     if (!pwattr)
@@ -376,8 +384,7 @@ void vm_paintclearbox(char x1, char y1, char x2, char y2, char attr)
 
 void vm_paintbox(char x1, char y1, char x2, char y2, char attr)
 {
-    int i;
-    DWORD len, width;
+    DWORD i, len, width;
     COORD coord;
     LPWORD pwattr;
     char y;
@@ -407,8 +414,7 @@ void vm_clearbox(char x1, char y1, char x2, char y2)
 
 void vm_fillbox(char x1, char y1, char x2, char y2, char ch)
 {
-    int i;
-    DWORD len, width;
+    DWORD i, len, width;
     COORD coord;
     char y, *pstr;
     width = (x2 - x1 + 1);
@@ -432,7 +438,7 @@ void vm_fillbox(char x1, char y1, char x2, char y2, char ch)
 
 void vm_gettext(char x1, char y1, char x2, char y2, char *dest)
 {
-    DWORD len, width;
+    DWORD i, len, width;
     COORD coord;
     LPWORD pwattr;
     char y, *pstr;
@@ -450,7 +456,6 @@ void vm_gettext(char x1, char y1, char x2, char y2, char *dest)
     }
     for (y = y1; y <= y2; y++)
     {
-        int i;
         coord.X = (DWORD) (x1 - 1);
         coord.Y = (DWORD) (y - 1);
         ReadConsoleOutputCharacterA(HOutput, pstr, width, coord, &len);
@@ -469,7 +474,7 @@ void vm_gettext(char x1, char y1, char x2, char y2, char *dest)
 
 void vm_puttext(char x1, char y1, char x2, char y2, char *srce)
 {
-    DWORD len, width;
+    DWORD i, len, width;
     COORD coord;
     LPWORD pwattr;
     char y, *pstr;
@@ -487,7 +492,6 @@ void vm_puttext(char x1, char y1, char x2, char y2, char *srce)
     }
     for (y = y1; y <= y2; y++)
     {
-        int i;
         for (i = 0; i < width; i++)
         {
             *(pstr + i) = *srce;
